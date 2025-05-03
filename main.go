@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
+
+	"github.com/durgarao310/zneha-backend/config"
 	"github.com/gin-gonic/gin"
 )
-import "zneha-backend/config"
 
 func main() {
 	// Connect to the database
