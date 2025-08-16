@@ -6,8 +6,8 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/routes"
 	"github.com/Durgarao310/zneha-backend/internal/service"
 
-	"github.com/gin-gonic/gin"
 	v1 "github.com/Durgarao310/zneha-backend/internal/api/v1"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
