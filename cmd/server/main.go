@@ -1,13 +1,13 @@
 package main
 
 import (
-	"your-app/internal/database"
-	"your-app/internal/repository"
-	"your-app/internal/routes"
-	"your-app/internal/service"
+	"github.com/Durgarao310/zneha-backend/internal/database"
+	"github.com/Durgarao310/zneha-backend/internal/repository"
+	"github.com/Durgarao310/zneha-backend/internal/routes"
+	"github.com/Durgarao310/zneha-backend/internal/service"
 
 	"github.com/gin-gonic/gin"
-	v1 "github.com/yourname/go-gin-hello/internal/api/v1"
+	v1 "github.com/Durgarao310/zneha-backend/internal/api/v1"
 )
 
 func main() {

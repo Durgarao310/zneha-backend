@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"your-app/internal/model"
+	"github.com/Durgarao310/zneha-backend/internal/model"
 
 	"gorm.io/gorm"
 )

@@ -3,8 +3,8 @@ package v1
 import (
 	"net/http"
 	"strconv"
-	"your-app/internal/model"
-	"your-app/internal/service"
+	"github.com/Durgarao310/zneha-backend/internal/model"
+	"github.com/Durgarao310/zneha-backend/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

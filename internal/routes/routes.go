@@ -1,7 +1,7 @@
 package routes
 
 import (
-	v1 "your-app/internal/api/v1"
+	v1 "github.com/Durgarao310/zneha-backend/internal/api/v1"
 
 	"github.com/gin-gonic/gin"
 )

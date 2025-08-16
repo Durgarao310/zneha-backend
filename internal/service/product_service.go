@@ -1,8 +1,8 @@
 package service
 
 import (
-	"backend/internal/model"
-	"backend/internal/repository"
+	"github.com/Durgarao310/zneha-backend/internal/model"
+	"github.com/Durgarao310/zneha-backend/internal/repository"
 )
 
 type ProductService interface {
