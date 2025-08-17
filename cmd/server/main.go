@@ -1,6 +1,7 @@
 package main
 
 import (
+	commonErrors "github.com/Durgarao310/zneha-backend/internal/common/errors"
 	"github.com/Durgarao310/zneha-backend/internal/database"
 	"github.com/Durgarao310/zneha-backend/internal/repository"
 	"github.com/Durgarao310/zneha-backend/internal/routes"
@@ -21,6 +22,7 @@ func main() {
 
 	// Router
 	r := gin.Default()
+	r.Use(commonErrors.GlobalErrorHandler())
 	routes.RegisterRoutes(r, productHandler)
 
 	r.Run(":8080") // Start server
