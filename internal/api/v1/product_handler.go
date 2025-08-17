@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,58 +21,87 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 func (h *ProductHandler) Create(c *gin.Context) {
 	var product model.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err.Error())
 		return
 	}
 
 	if err := h.service.Create(&product); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.InternalServerErrorResponse(c, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, product)
+	utils.CreatedResponse(c, product)
 }
 
 func (h *ProductHandler) GetAll(c *gin.Context) {
 	products, err := h.service.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.InternalServerErrorResponse(c, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, products)
+	
+	// Example of adding metadata for pagination (can be enhanced later)
+	meta := map[string]interface{}{
+		"total": len(products),
+		"page":  1,
+		"limit": len(products),
+	}
+	
+	utils.SuccessResponse(c, products, meta)
 }
 
 func (h *ProductHandler) GetByID(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-	product, err := h.service.GetByID(id)
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		utils.BadRequestResponse(c, "Invalid product ID format")
 		return
 	}
-	c.JSON(http.StatusOK, product)
+
+	product, err := h.service.GetByID(id)
+	if err != nil {
+		utils.NotFoundResponse(c, "Product not found")
+		return
+	}
+	
+	utils.SuccessResponse(c, product)
 }
 
 func (h *ProductHandler) Update(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid product ID format")
+		return
+	}
+
 	var product model.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err.Error())
 		return
 	}
 	product.ID = id
 
 	if err := h.service.Update(&product); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.InternalServerErrorResponse(c, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, product)
+	
+	utils.SuccessResponse(c, product)
 }
 
 func (h *ProductHandler) Delete(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err := h.service.Delete(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		utils.BadRequestResponse(c, "Invalid product ID format")
 		return
 	}
-	c.Status(http.StatusNoContent)
+
+	if err := h.service.Delete(id); err != nil {
+		utils.InternalServerErrorResponse(c, err.Error())
+		return
+	}
+	
+	utils.NoContentResponse(c)
 }
