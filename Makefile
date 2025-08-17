@@ -13,7 +13,7 @@ DB_SSLMODE?=disable
 
 # Tools
 GO=go
-AIR=air
+AIR=$(shell go env GOPATH)/bin/air
 
 ## ----------- COMMANDS -----------
 
@@ -31,7 +31,7 @@ build:
 # Install development tools
 install-dev-tools:
 	@echo "Installing development tools..."
-	@$(GO) install github.com/cosmtrek/air@latest
+	@$(GO) install github.com/air-verse/air@latest
 
 # Run database migrations
 migrate:

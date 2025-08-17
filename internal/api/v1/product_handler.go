@@ -3,9 +3,12 @@ package v1
 import (
 	"strconv"
 
+	"github.com/Durgarao310/zneha-backend/internal/api/middleware"
+	"github.com/Durgarao310/zneha-backend/internal/common/errors"
 	"github.com/Durgarao310/zneha-backend/internal/dto"
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/validator"
 	"github.com/Durgarao310/zneha-backend/utils"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +24,15 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 
 func (h *ProductHandler) Create(c *gin.Context) {
 	var req dto.ProductCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ValidationErrorResponse(c, err.Error())
+
+	// Use the middleware helper for clean JSON binding
+	if !middleware.BindJSON(c, &req) {
+		return // Middleware will handle the error response
+	}
+
+	// Additional business validation
+	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
+		c.Error(err)
 		return
 	}
 
@@ -39,7 +49,7 @@ func (h *ProductHandler) Create(c *gin.Context) {
 	}
 
 	if err := h.service.Create(&product); err != nil {
-		utils.InternalServerErrorResponse(c, err.Error())
+		c.Error(errors.New(errors.InternalServerError, "Failed to create product", err))
 		return
 	}
 
@@ -49,7 +59,7 @@ func (h *ProductHandler) Create(c *gin.Context) {
 func (h *ProductHandler) GetAll(c *gin.Context) {
 	products, err := h.service.GetAll()
 	if err != nil {
-		utils.InternalServerErrorResponse(c, err.Error())
+		c.Error(errors.New(errors.InternalServerError, "Failed to retrieve products", err))
 		return
 	}
 
@@ -68,13 +78,13 @@ func (h *ProductHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		utils.BadRequestResponse(c, "Invalid product ID format")
+		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
 	product, err := h.service.GetByID(id)
 	if err != nil {
-		utils.NotFoundResponse(c, "Product not found")
+		c.Error(errors.New(errors.UserNotFound, "Product not found", err))
 		return
 	}
 
@@ -85,13 +95,20 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		utils.BadRequestResponse(c, "Invalid product ID format")
+		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
 	var req dto.ProductUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ValidationErrorResponse(c, err.Error())
+
+	// Use the middleware helper for clean JSON binding
+	if !middleware.BindJSON(c, &req) {
+		return // Middleware will handle the error response
+	}
+
+	// Additional business validation
+	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
+		c.Error(err)
 		return
 	}
 
@@ -109,7 +126,7 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	}
 
 	if err := h.service.Update(&product); err != nil {
-		utils.InternalServerErrorResponse(c, err.Error())
+		c.Error(errors.New(errors.InternalServerError, "Failed to update product", err))
 		return
 	}
 
@@ -120,12 +137,12 @@ func (h *ProductHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		utils.BadRequestResponse(c, "Invalid product ID format")
+		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
 	if err := h.service.Delete(id); err != nil {
-		utils.InternalServerErrorResponse(c, err.Error())
+		c.Error(errors.New(errors.InternalServerError, "Failed to delete product", err))
 		return
 	}
 

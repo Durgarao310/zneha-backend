@@ -4,17 +4,16 @@ import "github.com/Durgarao310/zneha-backend/internal/model"
 
 // ProductCreateRequest represents payload for creating a product
 type ProductCreateRequest struct {
-	Name             string `json:"name" binding:"required,min=3,max=255"`
-	Description      string `json:"description,omitempty"`
+	Name             string `json:"name" binding:"required,min=3,max=255,printascii"`
+	Description      string `json:"description,omitempty" binding:"max=1000"`
 	ShortDescription string `json:"shortDescription,omitempty" binding:"max=255"`
 	Status           string `json:"status,omitempty" binding:"omitempty,oneof=active inactive"`
 }
 
-// ProductUpdateRequest represents payload for updating a product (same required fields for simplicity)
-// If partial updates are needed later, switch fields to pointer types and adjust logic.
+// ProductUpdateRequest represents payload for updating a product
 type ProductUpdateRequest struct {
-	Name             string `json:"name" binding:"required,min=3,max=255"`
-	Description      string `json:"description,omitempty"`
+	Name             string `json:"name" binding:"required,min=3,max=255,printascii"`
+	Description      string `json:"description,omitempty" binding:"max=1000"`
 	ShortDescription string `json:"shortDescription,omitempty" binding:"max=255"`
 	Status           string `json:"status,omitempty" binding:"omitempty,oneof=active inactive"`
 }
