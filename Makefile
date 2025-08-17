@@ -13,18 +13,25 @@ DB_SSLMODE?=disable
 
 # Tools
 GO=go
+AIR=air
 
 ## ----------- COMMANDS -----------
 
-# Run the app
+# Run the app with live-reload using Air
 run:
-	@echo "🚀 Starting $(APP_NAME)..."
-	@$(GO) run $(MAIN_FILE)
+	@echo "🚀 Starting $(APP_NAME) with live-reload..."
+	@echo "Note: Make sure 'air' is installed (run 'make install-dev-tools')."
+	@$(AIR) -c .air.toml
 
 # Build binary
 build:
 	@echo "🔨 Building $(APP_NAME)..."
 	@$(GO) build -o bin/$(APP_NAME) $(MAIN_FILE)
+
+# Install development tools
+install-dev-tools:
+	@echo "Installing development tools..."
+	@$(GO) install github.com/cosmtrek/air@latest
 
 # Run database migrations
 migrate:
