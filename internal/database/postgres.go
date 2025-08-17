@@ -1,14 +1,13 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/Durgarao310/zneha-backend/internal/config"
 	"github.com/Durgarao310/zneha-backend/internal/model"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -19,33 +18,27 @@ var DB *gorm.DB // global db instance
 
 // InitPostgres initializes the PostgreSQL database connection
 func InitPostgres() *gorm.DB {
-	// Load environment variables from .env file if present
-	if err := godotenv.Load(); err != nil {
-		log.Printf("⚠️ Warning: .env file not found, falling back to system env")
+	// Load configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("❌ Failed to load configuration: %v", err)
 	}
 
-	// Get database configuration from environment variables with defaults
-	host := getEnv("DB_HOST", "localhost")
-	port := getEnv("DB_PORT", "5432")
-	user := getEnv("DB_USER", "postgres")
-	password := getEnv("DB_PASSWORD", "zneha")
-	dbname := getEnv("DB_NAME", "zneha_backend")
-	sslmode := getEnv("DB_SSLMODE", "disable")
-	timezone := getEnv("DB_TIMEZONE", "Asia/Kolkata")
+	// Get DSN from config
+	dsn := cfg.GetDatabaseDSN()
 
-	// Build DSN (Data Source Name)
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		host, user, password, dbname, port, sslmode, timezone,
-	)
+	// Configure GORM logger based on environment
+	logLevel := logger.Info
+	if cfg.IsProduction() {
+		logLevel = logger.Warn // Less verbose in production
+	}
 
-	// Configure GORM logger (only show slow queries in production)
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
 			SlowThreshold: time.Second, // log queries slower than 1s
-			LogLevel:      logger.Info, // change to logger.Warn in prod
-			Colorful:      true,
+			LogLevel:      logLevel,
+			Colorful:      cfg.IsDevelopment(), // Only colorful in development
 		},
 	)
 
@@ -76,16 +69,9 @@ func InitPostgres() *gorm.DB {
 		log.Fatalf("❌ Failed to auto-migrate models: %v", err)
 	}
 
-	log.Printf("✅ Connected to Postgres: %s@%s:%s/%s", user, host, port, dbname)
+	log.Printf("✅ Connected to Postgres: %s@%s:%s/%s",
+		cfg.Database.User, cfg.Database.Host, cfg.Database.Port, cfg.Database.DBName)
 
 	DB = db
 	return db
-}
-
-// getEnv returns environment variable or fallback
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }

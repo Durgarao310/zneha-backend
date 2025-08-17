@@ -1,0 +1,37 @@
+# Application Configuration
+app:
+  name: "zneha-backend"
+  version: "1.0.0"
+  debug: true
+
+# Server Configuration
+server:
+  port: "8080"
+  host: "localhost"
+  environment: "development" # development, staging, production
+
+# Database Configuration
+database:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  password: "zneha"
+  db_name: "zneha_backend"
+  ssl_mode: "disable"
+  time_zone: "Asia/Kolkata"
+
+# JWT Configuration
+jwt:
+  secret: "your-secret-key-change-in-production"
+  expiry_hour: 24
+
+# Logging Configuration
+logging:
+  level: "info" # debug, info, warn, error
+  format: "json" # json, text
+  
+# Security Configuration
+security:
+  cors_enabled: true
+  rate_limit_enabled: true
+  max_requests_per_minute: 100
