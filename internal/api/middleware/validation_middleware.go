@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/Durgarao310/zneha-backend/internal/common/errors"
+	pkgMiddleware "github.com/Durgarao310/zneha-backend/pkg/middleware"
 	pkgValidator "github.com/Durgarao310/zneha-backend/pkg/validator"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -26,14 +26,14 @@ func ValidationMiddleware() gin.HandlerFunc {
 		}
 
 		// Handle custom AppError with specific error codes
-		if _, ok := err.Err.(*errors.AppError); ok {
+		if _, ok := err.Err.(*pkgMiddleware.AppError); ok {
 			// Let the global error handler deal with it
 			return
 		}
 
 		// Handle JSON parsing errors
 		if err.Error() == "invalid JSON" || err.Type == gin.ErrorTypeBind {
-			c.Error(errors.New(errors.ValidationError, "Invalid JSON format", err.Err))
+			c.Error(pkgMiddleware.New(pkgMiddleware.ValidationError, "Invalid JSON format", err.Err))
 			c.Abort()
 			return
 		}

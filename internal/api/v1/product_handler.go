@@ -3,10 +3,10 @@ package v1
 import (
 	"strconv"
 
-	"github.com/Durgarao310/zneha-backend/internal/common/errors"
 	"github.com/Durgarao310/zneha-backend/internal/dto"
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/middleware"
 	"github.com/Durgarao310/zneha-backend/pkg/validator"
 	"github.com/Durgarao310/zneha-backend/utils"
 
@@ -43,7 +43,7 @@ func (h *ProductHandler) Create(c *gin.Context) {
 	}
 
 	if err := h.service.Create(&product); err != nil {
-		c.Error(errors.New(errors.InternalServerError, "Failed to create product", err))
+		c.Error(middleware.New(middleware.InternalServerError, "Failed to create product", err))
 		return
 	}
 
@@ -53,7 +53,7 @@ func (h *ProductHandler) Create(c *gin.Context) {
 func (h *ProductHandler) GetAll(c *gin.Context) {
 	products, err := h.service.GetAll()
 	if err != nil {
-		c.Error(errors.New(errors.InternalServerError, "Failed to retrieve products", err))
+		c.Error(middleware.New(middleware.InternalServerError, "Failed to retrieve products", err))
 		return
 	}
 
@@ -72,13 +72,13 @@ func (h *ProductHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
+		c.Error(middleware.New(middleware.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
 	product, err := h.service.GetByID(id)
 	if err != nil {
-		c.Error(errors.New(errors.UserNotFound, "Product not found", err))
+		c.Error(middleware.New(middleware.UserNotFound, "Product not found", err))
 		return
 	}
 
@@ -89,7 +89,7 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
+		c.Error(middleware.New(middleware.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	}
 
 	if err := h.service.Update(&product); err != nil {
-		c.Error(errors.New(errors.InternalServerError, "Failed to update product", err))
+		c.Error(middleware.New(middleware.InternalServerError, "Failed to update product", err))
 		return
 	}
 
@@ -125,12 +125,12 @@ func (h *ProductHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		c.Error(errors.New(errors.InvalidFieldFormat, "Invalid product ID format", err))
+		c.Error(middleware.New(middleware.InvalidFieldFormat, "Invalid product ID format", err))
 		return
 	}
 
 	if err := h.service.Delete(id); err != nil {
-		c.Error(errors.New(errors.InternalServerError, "Failed to delete product", err))
+		c.Error(middleware.New(middleware.InternalServerError, "Failed to delete product", err))
 		return
 	}
 

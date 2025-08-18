@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"github.com/Durgarao310/zneha-backend/internal/common/errors"
+	"github.com/Durgarao310/zneha-backend/pkg/middleware"
 	"github.com/Durgarao310/zneha-backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -52,14 +52,14 @@ func GetValidationErrorMessage(fe validator.FieldError) string {
 }
 
 // ValidateBusinessRules performs custom business validation
-func ValidateBusinessRules(name, description, shortDescription *string) *errors.AppError {
+func ValidateBusinessRules(name, description, shortDescription *string) *middleware.AppError {
 	// Check for forbidden words or patterns
 	forbiddenWords := []string{"test", "dummy", "fake", "spam"}
 
 	if name != nil {
 		for _, word := range forbiddenWords {
 			if containsIgnoreCase(*name, word) {
-				return errors.New(errors.ValidationError, "Product name contains forbidden words", nil)
+				return middleware.New(middleware.ValidationError, "Product name contains forbidden words", nil)
 			}
 		}
 	}
@@ -67,13 +67,13 @@ func ValidateBusinessRules(name, description, shortDescription *string) *errors.
 	// Check description length consistency
 	if description != nil && shortDescription != nil {
 		if len(*shortDescription) > len(*description) && len(*description) > 0 {
-			return errors.New(errors.ValidationError, "Short description cannot be longer than description", nil)
+			return middleware.New(middleware.ValidationError, "Short description cannot be longer than description", nil)
 		}
 	}
 
 	// Check for minimum meaningful content
 	if name != nil && len(*name) < 3 {
-		return errors.New(errors.ValidationError, "Product name must be at least 3 characters", nil)
+		return middleware.New(middleware.ValidationError, "Product name must be at least 3 characters", nil)
 	}
 
 	return nil
