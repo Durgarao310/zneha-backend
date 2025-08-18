@@ -24,6 +24,8 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 func (h *ProductHandler) Create(c *gin.Context) {
 	var req dto.ProductCreateRequest
 
+	c.ShouldBindJSON(&req)
+
 	// Additional business validation
 	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
 		c.Error(err)
@@ -94,6 +96,13 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	}
 
 	var req dto.ProductUpdateRequest
+
+	// Bind JSON request to struct
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Error(middleware.New(middleware.InvalidFieldFormat, "Invalid request format", err))
+		return
+	}
+
 	// Additional business validation
 	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
 		c.Error(err)
