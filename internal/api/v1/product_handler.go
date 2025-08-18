@@ -3,7 +3,6 @@ package v1
 import (
 	"strconv"
 
-	"github.com/Durgarao310/zneha-backend/internal/api/middleware"
 	"github.com/Durgarao310/zneha-backend/internal/common/errors"
 	"github.com/Durgarao310/zneha-backend/internal/dto"
 	"github.com/Durgarao310/zneha-backend/internal/model"
@@ -24,11 +23,6 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 
 func (h *ProductHandler) Create(c *gin.Context) {
 	var req dto.ProductCreateRequest
-
-	// Use the middleware helper for clean JSON binding
-	if !middleware.BindJSON(c, &req) {
-		return // Middleware will handle the error response
-	}
 
 	// Additional business validation
 	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
@@ -100,12 +94,6 @@ func (h *ProductHandler) Update(c *gin.Context) {
 	}
 
 	var req dto.ProductUpdateRequest
-
-	// Use the middleware helper for clean JSON binding
-	if !middleware.BindJSON(c, &req) {
-		return // Middleware will handle the error response
-	}
-
 	// Additional business validation
 	if err := validator.ValidateBusinessRules(&req.Name, &req.Description, &req.ShortDescription); err != nil {
 		c.Error(err)

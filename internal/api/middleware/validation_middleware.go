@@ -39,12 +39,3 @@ func ValidationMiddleware() gin.HandlerFunc {
 		}
 	}
 }
-
-// BindJSON is a helper function that binds JSON and adds errors to gin context
-func BindJSON(c *gin.Context, obj interface{}) bool {
-	if err := c.ShouldBindJSON(obj); err != nil {
-		c.Error(err)
-		return false
-	}
-	return true
-}
