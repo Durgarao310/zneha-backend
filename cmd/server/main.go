@@ -23,8 +23,8 @@ func main() {
 
 	// Router
 	r := gin.Default()
+	r.Use(middleware.JSONMiddleware())
 	r.Use(commonErrors.GlobalErrorHandler())
-	r.Use(middleware.JSONMiddleware()) // force application/json\
 	routes.RegisterRoutes(r, productHandler)
 
 	r.Run(":8080") // Start server
