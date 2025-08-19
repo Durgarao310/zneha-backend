@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Durgarao310/zneha-backend/internal/api/controller"
 	"github.com/Durgarao310/zneha-backend/internal/database"
 	"github.com/Durgarao310/zneha-backend/internal/repository"
 	"github.com/Durgarao310/zneha-backend/internal/routes"
@@ -8,7 +9,6 @@ import (
 	"github.com/Durgarao310/zneha-backend/pkg/logger"
 	pkgMiddleware "github.com/Durgarao310/zneha-backend/pkg/middleware"
 
-	v1 "github.com/Durgarao310/zneha-backend/internal/api/v1"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -27,7 +27,7 @@ func main() {
 	// Dependencies
 	productRepo := repository.NewProductRepository(db)
 	productService := service.NewProductService(productRepo)
-	productHandler := v1.NewProductHandler(productService)
+	productController := controller.NewProductController(productService)
 
 	// Router
 	r := gin.Default()
@@ -39,7 +39,7 @@ func main() {
 	}))
 
 	log.Info("Starting server with middleware...")
-	routes.RegisterRoutes(r, productHandler)
+	routes.RegisterRoutes(r, productController)
 
 	log.Info("Server listening on :8080")
 	r.Run(":8080") // Start server
