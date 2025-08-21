@@ -53,13 +53,52 @@ func (c *CategoryController) GetCategory(ctx *gin.Context) {
 }
 
 func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
+	// Get pagination parameters from query string
+	page := 1
+	limit := 10
+
+	if pageStr := ctx.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
 	categories, err := c.categoryService.GetAllCategories()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendSuccess(ctx, http.StatusOK, categories)
+	totalItems := len(categories)
+
+	// Calculate pagination
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+
+	// Handle pagination bounds
+	if startIndex >= totalItems {
+		// If page is beyond available data, return empty results
+		categories = []model.Category{}
+		api.SendPaginatedSuccess(ctx, http.StatusOK, categories, page, limit, totalItems)
+		return
+	}
+
+	if endIndex > totalItems {
+		endIndex = totalItems
+	}
+
+	// Get the paginated slice
+	if startIndex < totalItems {
+		categories = categories[startIndex:endIndex]
+	}
+
+	api.SendPaginatedSuccess(ctx, http.StatusOK, categories, page, limit, totalItems)
 }
 
 func (c *CategoryController) GetRootCategories(ctx *gin.Context) {
@@ -80,13 +119,52 @@ func (c *CategoryController) GetSubcategories(ctx *gin.Context) {
 		return
 	}
 
+	// Get pagination parameters from query string
+	page := 1
+	limit := 10
+
+	if pageStr := ctx.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
 	subcategories, err := c.categoryService.GetSubCategories(parentID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendSuccess(ctx, http.StatusOK, subcategories)
+	totalItems := len(subcategories)
+
+	// Calculate pagination
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+
+	// Handle pagination bounds
+	if startIndex >= totalItems {
+		// If page is beyond available data, return empty results
+		subcategories = []model.Category{}
+		api.SendPaginatedSuccess(ctx, http.StatusOK, subcategories, page, limit, totalItems)
+		return
+	}
+
+	if endIndex > totalItems {
+		endIndex = totalItems
+	}
+
+	// Get the paginated slice
+	if startIndex < totalItems {
+		subcategories = subcategories[startIndex:endIndex]
+	}
+
+	api.SendPaginatedSuccess(ctx, http.StatusOK, subcategories, page, limit, totalItems)
 }
 
 func (c *CategoryController) UpdateCategory(ctx *gin.Context) {

@@ -15,10 +15,21 @@ type APIResponse[T any] struct {
 
 // Meta contains metadata about the request.
 type Meta struct {
-	RequestID        string    `json:"requestId"`
-	Timestamp        time.Time `json:"timestamp"`
-	APIVersion       string    `json:"apiVersion"`
-	ProcessingTimeMs int64     `json:"processingTimeMs"`
+	RequestID        string      `json:"requestId"`
+	Timestamp        time.Time   `json:"timestamp"`
+	APIVersion       string      `json:"apiVersion"`
+	ProcessingTimeMs int64       `json:"processingTimeMs"`
+	Pagination       *Pagination `json:"pagination,omitempty"`
+}
+
+// Pagination contains pagination information for list responses.
+type Pagination struct {
+	Page       int  `json:"page"`
+	Limit      int  `json:"limit"`
+	TotalPages int  `json:"totalPages"`
+	TotalItems int  `json:"totalItems"`
+	HasNext    bool `json:"hasNext"`
+	HasPrev    bool `json:"hasPrev"`
 }
 
 // Links supports HATEOAS for resource navigation, universally applicable.
@@ -37,6 +48,34 @@ func NewSuccessResponse[T any](c *gin.Context, data T) APIResponse[T] {
 	}
 }
 
+// NewPaginatedResponse creates a paginated success response with the given data and pagination info.
+func NewPaginatedResponse[T any](c *gin.Context, data T, page, limit, totalItems int) APIResponse[T] {
+	totalPages := (totalItems + limit - 1) / limit
+	if totalPages == 0 {
+		totalPages = 0
+	}
+
+	pagination := &Pagination{
+		Page:       page,
+		Limit:      limit,
+		TotalPages: totalPages,
+		TotalItems: totalItems,
+		HasNext:    page < totalPages,
+		HasPrev:    page > 1,
+	}
+
+	return APIResponse[T]{
+		Data: data,
+		Meta: Meta{
+			RequestID:        getRequestID(c),
+			Timestamp:        time.Now().UTC(),
+			APIVersion:       "1.0.0",
+			ProcessingTimeMs: getProcessingTime(c),
+			Pagination:       pagination,
+		},
+	}
+}
+
 // SendSuccess sends a success response with the specified HTTP status code.
 func SendSuccess[T any](c *gin.Context, status int, data T) {
 	// Validate that the status code is in the success range (2xx)
@@ -46,6 +85,17 @@ func SendSuccess[T any](c *gin.Context, status int, data T) {
 		return
 	}
 	c.JSON(status, NewSuccessResponse(c, data))
+}
+
+// SendPaginatedSuccess sends a paginated success response with the specified HTTP status code.
+func SendPaginatedSuccess[T any](c *gin.Context, status int, data T, page, limit, totalItems int) {
+	// Validate that the status code is in the success range (2xx)
+	if status < 200 || status > 299 {
+		// Fallback to 200 if an invalid status is provided
+		c.JSON(200, NewPaginatedResponse(c, data, page, limit, totalItems))
+		return
+	}
+	c.JSON(status, NewPaginatedResponse(c, data, page, limit, totalItems))
 }
 
 // Helper to get request ID from context (set by middleware).

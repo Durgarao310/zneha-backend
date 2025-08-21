@@ -72,13 +72,52 @@ func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
+	// Get pagination parameters from query string
+	page := 1
+	limit := 10
+
+	if pageStr := ctx.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
 	variants, err := c.variantService.GetVariantsByProductID(productID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendSuccess(ctx, http.StatusOK, variants)
+	totalItems := len(variants)
+
+	// Calculate pagination
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+
+	// Handle pagination bounds
+	if startIndex >= totalItems {
+		// If page is beyond available data, return empty results
+		variants = []model.Variant{}
+		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+		return
+	}
+
+	if endIndex > totalItems {
+		endIndex = totalItems
+	}
+
+	// Get the paginated slice
+	if startIndex < totalItems {
+		variants = variants[startIndex:endIndex]
+	}
+
+	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
 }
 
 func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
@@ -89,13 +128,52 @@ func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
+	// Get pagination parameters from query string
+	page := 1
+	limit := 10
+
+	if pageStr := ctx.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
 	variants, err := c.variantService.GetActiveVariantsByProductID(productID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendSuccess(ctx, http.StatusOK, variants)
+	totalItems := len(variants)
+
+	// Calculate pagination
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+
+	// Handle pagination bounds
+	if startIndex >= totalItems {
+		// If page is beyond available data, return empty results
+		variants = []model.Variant{}
+		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+		return
+	}
+
+	if endIndex > totalItems {
+		endIndex = totalItems
+	}
+
+	// Get the paginated slice
+	if startIndex < totalItems {
+		variants = variants[startIndex:endIndex]
+	}
+
+	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
 }
 
 func (c *VariantController) UpdateVariant(ctx *gin.Context) {

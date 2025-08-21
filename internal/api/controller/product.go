@@ -57,14 +57,52 @@ func (c *productController) Create(ctx *gin.Context) {
 
 // GetAll handles retrieving all products with optional pagination
 func (c *productController) GetAll(ctx *gin.Context) {
+	// Get pagination parameters from query string
+	page := 1
+	limit := 10
+
+	if pageStr := ctx.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr := ctx.Query("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
+			limit = l
+		}
+	}
+
 	products, err := c.service.GetAll()
 	if err != nil {
 		return
 	}
 
 	responses := dto.ToProductResponseList(products)
+	totalItems := len(responses)
 
-	api.SendSuccess(ctx, http.StatusOK, responses)
+	// Calculate pagination
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+
+	// Handle pagination bounds
+	if startIndex >= totalItems {
+		// If page is beyond available data, return empty results
+		responses = []dto.ProductResponse{}
+		api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, totalItems)
+		return
+	}
+
+	if endIndex > totalItems {
+		endIndex = totalItems
+	}
+
+	// Get the paginated slice
+	if startIndex < totalItems {
+		responses = responses[startIndex:endIndex]
+	}
+
+	api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, totalItems)
 }
 
 // GetByID handles retrieving a product by its ID
