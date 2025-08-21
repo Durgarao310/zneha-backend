@@ -7,6 +7,7 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
 	"github.com/Durgarao310/zneha-backend/pkg/api"
+	"github.com/Durgarao310/zneha-backend/pkg/pagination"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,21 +61,8 @@ func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
 		return
 	}
 
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	media, err := c.mediaService.GetMediaByProductID(productID)
 	if err != nil {
@@ -85,14 +73,14 @@ func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
 	totalItems := len(media)
 
 	// Calculate pagination
-	startIndex := (page - 1) * limit
-	endIndex := startIndex + limit
+	startIndex := (params.Page - 1) * params.Limit
+	endIndex := startIndex + params.Limit
 
 	// Handle pagination bounds
 	if startIndex >= totalItems {
 		// If page is beyond available data, return empty results
 		media = []model.Media{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, media, page, limit, totalItems)
+		api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
 		return
 	}
 
@@ -105,7 +93,7 @@ func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
 		media = media[startIndex:endIndex]
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, media, page, limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
 }
 
 func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
@@ -116,21 +104,8 @@ func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
 		return
 	}
 
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	media, err := c.mediaService.GetMediaByVariantID(variantID)
 	if err != nil {
@@ -141,14 +116,14 @@ func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
 	totalItems := len(media)
 
 	// Calculate pagination
-	startIndex := (page - 1) * limit
-	endIndex := startIndex + limit
+	startIndex := (params.Page - 1) * params.Limit
+	endIndex := startIndex + params.Limit
 
 	// Handle pagination bounds
 	if startIndex >= totalItems {
 		// If page is beyond available data, return empty results
 		media = []model.Media{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, media, page, limit, totalItems)
+		api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
 		return
 	}
 
@@ -161,7 +136,7 @@ func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
 		media = media[startIndex:endIndex]
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, media, page, limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
 }
 
 func (c *MediaController) UpdateMedia(ctx *gin.Context) {

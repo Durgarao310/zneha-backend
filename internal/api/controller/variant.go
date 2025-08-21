@@ -7,6 +7,7 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
 	"github.com/Durgarao310/zneha-backend/pkg/api"
+	"github.com/Durgarao310/zneha-backend/pkg/pagination"
 	"github.com/gin-gonic/gin"
 )
 
@@ -72,21 +73,8 @@ func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	variants, err := c.variantService.GetVariantsByProductID(productID)
 	if err != nil {
@@ -97,14 +85,14 @@ func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
 	totalItems := len(variants)
 
 	// Calculate pagination
-	startIndex := (page - 1) * limit
-	endIndex := startIndex + limit
+	startIndex := (params.Page - 1) * params.Limit
+	endIndex := startIndex + params.Limit
 
 	// Handle pagination bounds
 	if startIndex >= totalItems {
 		// If page is beyond available data, return empty results
 		variants = []model.Variant{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, params.Page, params.Limit, totalItems)
 		return
 	}
 
@@ -117,7 +105,7 @@ func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
 		variants = variants[startIndex:endIndex]
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, params.Page, params.Limit, totalItems)
 }
 
 func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
@@ -128,21 +116,8 @@ func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	variants, err := c.variantService.GetActiveVariantsByProductID(productID)
 	if err != nil {
@@ -153,14 +128,14 @@ func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
 	totalItems := len(variants)
 
 	// Calculate pagination
-	startIndex := (page - 1) * limit
-	endIndex := startIndex + limit
+	startIndex := (params.Page - 1) * params.Limit
+	endIndex := startIndex + params.Limit
 
 	// Handle pagination bounds
 	if startIndex >= totalItems {
 		// If page is beyond available data, return empty results
 		variants = []model.Variant{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+		api.SendPaginatedSuccess(ctx, http.StatusOK, variants, params.Page, params.Limit, totalItems)
 		return
 	}
 
@@ -173,7 +148,7 @@ func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
 		variants = variants[startIndex:endIndex]
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, page, limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, variants, params.Page, params.Limit, totalItems)
 }
 
 func (c *VariantController) UpdateVariant(ctx *gin.Context) {

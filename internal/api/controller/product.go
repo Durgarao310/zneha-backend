@@ -8,6 +8,7 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
 	"github.com/Durgarao310/zneha-backend/pkg/api"
+	"github.com/Durgarao310/zneha-backend/pkg/pagination"
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,24 +58,11 @@ func (c *productController) Create(ctx *gin.Context) {
 
 // GetAll handles retrieving all products with optional pagination
 func (c *productController) GetAll(ctx *gin.Context) {
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	// Use efficient database pagination
-	products, totalItems, err := c.service.GetWithPagination(page, limit)
+	products, totalItems, err := c.service.GetWithPagination(params.Page, params.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -82,7 +70,7 @@ func (c *productController) GetAll(ctx *gin.Context) {
 
 	responses := dto.ToProductResponseList(products)
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, int(totalItems))
+	api.SendPaginatedSuccess(ctx, http.StatusOK, responses, params.Page, params.Limit, int(totalItems))
 }
 
 // GetByID handles retrieving a product by its ID

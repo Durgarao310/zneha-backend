@@ -7,6 +7,7 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
 	"github.com/Durgarao310/zneha-backend/pkg/api"
+	"github.com/Durgarao310/zneha-backend/pkg/pagination"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,30 +54,17 @@ func (c *CategoryController) GetCategory(ctx *gin.Context) {
 }
 
 func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
-
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
 	// Use efficient database pagination
-	categories, totalItems, err := c.categoryService.GetAllCategoriesWithPagination(page, limit)
+	categories, totalItems, err := c.categoryService.GetAllCategoriesWithPagination(params.Page, params.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, categories, page, limit, int(totalItems))
+	api.SendPaginatedSuccess(ctx, http.StatusOK, categories, params.Page, params.Limit, int(totalItems))
 }
 
 func (c *CategoryController) GetRootCategories(ctx *gin.Context) {
@@ -97,29 +85,16 @@ func (c *CategoryController) GetSubcategories(ctx *gin.Context) {
 		return
 	}
 
-	// Get pagination parameters from query string
-	page := 1
-	limit := 10
+	// Use common pagination utility
+	params := pagination.GetPaginationParams(ctx)
 
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
-		}
-	}
-
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
-	}
-
-	subcategories, totalItems, err := c.categoryService.GetSubCategoriesWithPagination(parentID, page, limit)
+	subcategories, totalItems, err := c.categoryService.GetSubCategoriesWithPagination(parentID, params.Page, params.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	api.SendPaginatedSuccess(ctx, http.StatusOK, subcategories, page, limit, int(totalItems))
+	api.SendPaginatedSuccess(ctx, http.StatusOK, subcategories, params.Page, params.Limit, int(totalItems))
 }
 
 func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
