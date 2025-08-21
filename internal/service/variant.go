@@ -31,8 +31,16 @@ func (s *VariantService) GetVariantsByProductID(productID uint64) ([]model.Varia
 	return s.variantRepo.GetByProductID(productID)
 }
 
+func (s *VariantService) GetVariantsByProductIDWithPagination(productID uint64, page, limit int) ([]model.Variant, int64, error) {
+	return s.variantRepo.GetByProductIDWithPagination(productID, page, limit)
+}
+
 func (s *VariantService) GetActiveVariantsByProductID(productID uint64) ([]model.Variant, error) {
 	return s.variantRepo.GetActiveByProductID(productID)
+}
+
+func (s *VariantService) GetActiveVariantsByProductIDWithPagination(productID uint64, page, limit int) ([]model.Variant, int64, error) {
+	return s.variantRepo.GetActiveByProductIDWithPagination(productID, page, limit)
 }
 
 func (s *VariantService) UpdateVariant(variant *model.Variant) error {

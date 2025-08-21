@@ -27,8 +27,16 @@ func (s *MediaService) GetMediaByProductID(productID uint64) ([]model.Media, err
 	return s.mediaRepo.GetByProductID(productID)
 }
 
+func (s *MediaService) GetMediaByProductIDWithPagination(productID uint64, page, limit int) ([]model.Media, int64, error) {
+	return s.mediaRepo.GetByProductIDWithPagination(productID, page, limit)
+}
+
 func (s *MediaService) GetMediaByVariantID(variantID uint64) ([]model.Media, error) {
 	return s.mediaRepo.GetByVariantID(variantID)
+}
+
+func (s *MediaService) GetMediaByVariantIDWithPagination(variantID uint64, page, limit int) ([]model.Media, int64, error) {
+	return s.mediaRepo.GetByVariantIDWithPagination(variantID, page, limit)
 }
 
 func (s *MediaService) UpdateMedia(media *model.Media) error {

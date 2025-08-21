@@ -64,36 +64,14 @@ func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
 	// Use common pagination utility
 	params := pagination.GetPaginationParams(ctx)
 
-	media, err := c.mediaService.GetMediaByProductID(productID)
+	// Use efficient database-level pagination
+	media, totalItems, err := c.mediaService.GetMediaByProductIDWithPagination(productID, params.Page, params.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	totalItems := len(media)
-
-	// Calculate pagination
-	startIndex := (params.Page - 1) * params.Limit
-	endIndex := startIndex + params.Limit
-
-	// Handle pagination bounds
-	if startIndex >= totalItems {
-		// If page is beyond available data, return empty results
-		media = []model.Media{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
-		return
-	}
-
-	if endIndex > totalItems {
-		endIndex = totalItems
-	}
-
-	// Get the paginated slice
-	if startIndex < totalItems {
-		media = media[startIndex:endIndex]
-	}
-
-	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, int(totalItems))
 }
 
 func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
@@ -107,36 +85,14 @@ func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
 	// Use common pagination utility
 	params := pagination.GetPaginationParams(ctx)
 
-	media, err := c.mediaService.GetMediaByVariantID(variantID)
+	// Use efficient database-level pagination
+	media, totalItems, err := c.mediaService.GetMediaByVariantIDWithPagination(variantID, params.Page, params.Limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	totalItems := len(media)
-
-	// Calculate pagination
-	startIndex := (params.Page - 1) * params.Limit
-	endIndex := startIndex + params.Limit
-
-	// Handle pagination bounds
-	if startIndex >= totalItems {
-		// If page is beyond available data, return empty results
-		media = []model.Media{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
-		return
-	}
-
-	if endIndex > totalItems {
-		endIndex = totalItems
-	}
-
-	// Get the paginated slice
-	if startIndex < totalItems {
-		media = media[startIndex:endIndex]
-	}
-
-	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, media, params.Page, params.Limit, int(totalItems))
 }
 
 func (c *MediaController) UpdateMedia(ctx *gin.Context) {

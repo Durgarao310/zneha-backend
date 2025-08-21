@@ -10,6 +10,8 @@ type MediaRepository interface {
 	GetByID(id uint64) (*model.Media, error)
 	GetByProductID(productID uint64) ([]model.Media, error)
 	GetByVariantID(variantID uint64) ([]model.Media, error)
+	GetByProductIDWithPagination(productID uint64, page, limit int) ([]model.Media, int64, error)
+	GetByVariantIDWithPagination(variantID uint64, page, limit int) ([]model.Media, int64, error)
 	GetPrimaryByProductID(productID uint64) (*model.Media, error)
 	Update(media *model.Media) error
 	Delete(id uint64) error
@@ -40,10 +42,50 @@ func (r *mediaRepository) GetByProductID(productID uint64) ([]model.Media, error
 	return media, err
 }
 
+func (r *mediaRepository) GetByProductIDWithPagination(productID uint64, page, limit int) ([]model.Media, int64, error) {
+	var media []model.Media
+	var total int64
+
+	// Get total count for this product
+	if err := r.db.Model(&model.Media{}).Where("product_id = ?", productID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated results using database-level pagination
+	offset := (page - 1) * limit
+	err := r.db.Where("product_id = ?", productID).
+		Order("position ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&media).Error
+
+	return media, total, err
+}
+
 func (r *mediaRepository) GetByVariantID(variantID uint64) ([]model.Media, error) {
 	var media []model.Media
 	err := r.db.Where("variant_id = ?", variantID).Order("position ASC").Find(&media).Error
 	return media, err
+}
+
+func (r *mediaRepository) GetByVariantIDWithPagination(variantID uint64, page, limit int) ([]model.Media, int64, error) {
+	var media []model.Media
+	var total int64
+
+	// Get total count for this variant
+	if err := r.db.Model(&model.Media{}).Where("variant_id = ?", variantID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated results using database-level pagination
+	offset := (page - 1) * limit
+	err := r.db.Where("variant_id = ?", variantID).
+		Order("position ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&media).Error
+
+	return media, total, err
 }
 
 func (r *mediaRepository) GetPrimaryByProductID(productID uint64) (*model.Media, error) {
