@@ -6,6 +6,7 @@ import (
 	"github.com/Durgarao310/zneha-backend/internal/repository"
 	"github.com/Durgarao310/zneha-backend/internal/routes"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/api"
 	"github.com/Durgarao310/zneha-backend/pkg/logger"
 	pkgMiddleware "github.com/Durgarao310/zneha-backend/pkg/middleware"
 
@@ -32,11 +33,12 @@ func main() {
 	// Router
 	r := gin.Default()
 
+	// Apply request metadata middleware
+	r.Use(api.RequestMetaMiddleware())
+
 	// Apply global middleware from pkg/middleware
 	r.Use(pkgMiddleware.JSONMiddleware())
-	r.Use(pkgMiddleware.GlobalErrorHandler(pkgMiddleware.ErrorHandlerConfig{
-		Logger: zapLogger,
-	}))
+	r.Use(pkgMiddleware.GlobalErrorHandler())
 
 	log.Info("Starting server with middleware...")
 	routes.RegisterRoutes(r, productController)

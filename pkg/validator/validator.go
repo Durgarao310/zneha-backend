@@ -1,27 +1,14 @@
 package validator
 
 import (
-	"github.com/Durgarao310/zneha-backend/pkg/middleware"
-	"github.com/Durgarao310/zneha-backend/utils"
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 // HandleValidationErrors processes validation errors and returns structured field errors
 func HandleValidationErrors(c *gin.Context, err error) bool {
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
-		fieldErrors := make([]utils.FieldError, len(validationErrors))
-		for i, fe := range validationErrors {
-			fieldErrors[i] = utils.FieldError{
-				Field:   fe.Field(),
-				Tag:     fe.Tag(),
-				Value:   fe.Value(),
-				Message: GetValidationErrorMessage(fe),
-			}
-		}
-		utils.DetailedValidationErrorResponse(c, fieldErrors)
-		return true
-	}
 	return false
 }
 
@@ -52,14 +39,14 @@ func GetValidationErrorMessage(fe validator.FieldError) string {
 }
 
 // ValidateBusinessRules performs custom business validation
-func ValidateBusinessRules(name, description, shortDescription *string) *middleware.AppError {
+func ValidateBusinessRules(name, description, shortDescription *string) error {
 	// Check for forbidden words or patterns
 	forbiddenWords := []string{"test", "dummy", "fake", "spam"}
 
 	if name != nil {
 		for _, word := range forbiddenWords {
 			if containsIgnoreCase(*name, word) {
-				return middleware.New(middleware.ValidationError, "Product name contains forbidden words", nil)
+				return fmt.Errorf("name contains forbidden word: %s", word)
 			}
 		}
 	}
@@ -67,13 +54,13 @@ func ValidateBusinessRules(name, description, shortDescription *string) *middlew
 	// Check description length consistency
 	if description != nil && shortDescription != nil {
 		if len(*shortDescription) > len(*description) && len(*description) > 0 {
-			return middleware.New(middleware.ValidationError, "Short description cannot be longer than description", nil)
+			return fmt.Errorf("short description cannot be longer than description")
 		}
 	}
 
 	// Check for minimum meaningful content
 	if name != nil && len(*name) < 3 {
-		return middleware.New(middleware.ValidationError, "Product name must be at least 3 characters", nil)
+		return fmt.Errorf("name must be at least 3 characters")
 	}
 
 	return nil

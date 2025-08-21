@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"net/http"
+
 	pkgMiddleware "github.com/Durgarao310/zneha-backend/pkg/middleware"
 	pkgValidator "github.com/Durgarao310/zneha-backend/pkg/validator"
 	"github.com/gin-gonic/gin"
@@ -25,15 +27,9 @@ func ValidationMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Handle custom AppError with specific error codes
-		if _, ok := err.Err.(*pkgMiddleware.AppError); ok {
-			// Let the global error handler deal with it
-			return
-		}
-
 		// Handle JSON parsing errors
 		if err.Error() == "invalid JSON" || err.Type == gin.ErrorTypeBind {
-			c.Error(pkgMiddleware.New(pkgMiddleware.ValidationError, "Invalid JSON format", err.Err))
+			pkgMiddleware.Error(c, http.StatusBadRequest, "Invalid JSON format", err.Err)
 			c.Abort()
 			return
 		}
