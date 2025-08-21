@@ -11,6 +11,7 @@ type ProductService interface {
 	GetByID(id uint64) (*model.Product, error)
 	Update(product *model.Product) error
 	Delete(id uint64) error
+	GetWithPagination(page, limit int) ([]model.Product, int64, error)
 }
 
 type productService struct {
@@ -39,4 +40,8 @@ func (s *productService) Update(product *model.Product) error {
 
 func (s *productService) Delete(id uint64) error {
 	return s.repo.Delete(id)
+}
+
+func (s *productService) GetWithPagination(page, limit int) ([]model.Product, int64, error) {
+	return s.repo.FindWithPagination(page, limit)
 }

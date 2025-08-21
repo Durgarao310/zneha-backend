@@ -13,6 +13,8 @@ type CategoryRepository interface {
 	GetMainCategories() ([]model.Category, error)
 	Update(category *model.Category) error
 	Delete(id uint64) error
+	GetAllWithPagination(page, limit int) ([]model.Category, int64, error)
+	GetByParentIDWithPagination(parentID *uint64, page, limit int) ([]model.Category, int64, error)
 }
 
 type categoryRepository struct {
@@ -57,4 +59,40 @@ func (r *categoryRepository) Update(category *model.Category) error {
 
 func (r *categoryRepository) Delete(id uint64) error {
 	return r.db.Delete(&model.Category{}, id).Error
+}
+
+func (r *categoryRepository) GetAllWithPagination(page, limit int) ([]model.Category, int64, error) {
+	var categories []model.Category
+	var total int64
+
+	// Get total count
+	if err := r.db.Model(&model.Category{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	// Fetch paginated results
+	err := r.db.Offset(offset).Limit(limit).Find(&categories).Error
+	return categories, total, err
+}
+
+func (r *categoryRepository) GetByParentIDWithPagination(parentID *uint64, page, limit int) ([]model.Category, int64, error) {
+	var categories []model.Category
+	var total int64
+
+	query := r.db.Model(&model.Category{}).Where("parent_id = ?", parentID)
+
+	// Get total count
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	// Fetch paginated results
+	err := query.Offset(offset).Limit(limit).Find(&categories).Error
+	return categories, total, err
 }

@@ -73,36 +73,16 @@ func (c *productController) GetAll(ctx *gin.Context) {
 		}
 	}
 
-	products, err := c.service.GetAll()
+	// Use efficient database pagination
+	products, totalItems, err := c.service.GetWithPagination(page, limit)
 	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	responses := dto.ToProductResponseList(products)
-	totalItems := len(responses)
 
-	// Calculate pagination
-	startIndex := (page - 1) * limit
-	endIndex := startIndex + limit
-
-	// Handle pagination bounds
-	if startIndex >= totalItems {
-		// If page is beyond available data, return empty results
-		responses = []dto.ProductResponse{}
-		api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, totalItems)
-		return
-	}
-
-	if endIndex > totalItems {
-		endIndex = totalItems
-	}
-
-	// Get the paginated slice
-	if startIndex < totalItems {
-		responses = responses[startIndex:endIndex]
-	}
-
-	api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, totalItems)
+	api.SendPaginatedSuccess(ctx, http.StatusOK, responses, page, limit, int(totalItems))
 }
 
 // GetByID handles retrieving a product by its ID

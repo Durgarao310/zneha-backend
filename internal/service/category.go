@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/repository"
 )
@@ -14,6 +15,8 @@ type CategoryService interface {
 	GetSubCategories(parentID uint64) ([]model.Category, error)
 	UpdateCategory(category *model.Category) error
 	DeleteCategory(id uint64) error
+	GetAllCategoriesWithPagination(page, limit int) ([]model.Category, int64, error)
+	GetSubCategoriesWithPagination(parentID uint64, page, limit int) ([]model.Category, int64, error)
 }
 
 type categoryService struct {
@@ -83,4 +86,12 @@ func (s *categoryService) DeleteCategory(id uint64) error {
 	}
 
 	return s.categoryRepo.Delete(id)
+}
+
+func (s *categoryService) GetAllCategoriesWithPagination(page, limit int) ([]model.Category, int64, error) {
+	return s.categoryRepo.GetAllWithPagination(page, limit)
+}
+
+func (s *categoryService) GetSubCategoriesWithPagination(parentID uint64, page, limit int) ([]model.Category, int64, error) {
+	return s.categoryRepo.GetByParentIDWithPagination(&parentID, page, limit)
 }
