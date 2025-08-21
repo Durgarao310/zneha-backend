@@ -25,10 +25,23 @@ func main() {
 	// Init DB
 	db := database.InitPostgres() // implement in internal/database/postgres.go
 
-	// Dependencies
+	// Dependencies - Repositories
 	productRepo := repository.NewProductRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
+	mediaRepo := repository.NewMediaRepository(db)
+	variantRepo := repository.NewVariantRepository(db)
+
+	// Dependencies - Services
 	productService := service.NewProductService(productRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
+	mediaService := service.NewMediaService(mediaRepo)
+	variantService := service.NewVariantService(variantRepo)
+
+	// Dependencies - Controllers
 	productController := controller.NewProductController(productService)
+	categoryController := controller.NewCategoryController(categoryService)
+	mediaController := controller.NewMediaController(mediaService)
+	variantController := controller.NewVariantController(variantService)
 
 	// Router
 	r := gin.Default()
@@ -41,7 +54,7 @@ func main() {
 	r.Use(pkgMiddleware.GlobalErrorHandler())
 
 	log.Info("Starting server with middleware...")
-	routes.RegisterRoutes(r, productController)
+	routes.RegisterRoutes(r, productController, categoryController, mediaController, variantController)
 
 	log.Info("Server listening on :8080")
 	r.Run(":8080") // Start server
