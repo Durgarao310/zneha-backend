@@ -64,18 +64,7 @@ func (c *productController) GetAll(ctx *gin.Context) {
 
 	responses := dto.ToProductResponseList(products)
 
-	meta := map[string]any{
-		"total": len(responses),
-		"page":  1,
-		"limit": len(responses),
-	}
-
-	data := map[string]any{
-		"products": responses,
-		"meta":     meta,
-	}
-
-	api.SendSuccess(ctx, http.StatusOK, data)
+	api.SendSuccess(ctx, http.StatusOK, responses)
 }
 
 // GetByID handles retrieving a product by its ID
