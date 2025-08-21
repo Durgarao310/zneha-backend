@@ -6,6 +6,7 @@ import (
 
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func (c *CategoryController) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, category)
+	api.SendSuccess(ctx, http.StatusCreated, category)
 }
 
 func (c *CategoryController) GetCategory(ctx *gin.Context) {
@@ -48,7 +49,7 @@ func (c *CategoryController) GetCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, category)
+	api.SendSuccess(ctx, http.StatusOK, category)
 }
 
 func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
@@ -58,7 +59,7 @@ func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, categories)
+	api.SendSuccess(ctx, http.StatusOK, categories)
 }
 
 func (c *CategoryController) GetRootCategories(ctx *gin.Context) {
@@ -68,7 +69,7 @@ func (c *CategoryController) GetRootCategories(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, categories)
+	api.SendSuccess(ctx, http.StatusOK, categories)
 }
 
 func (c *CategoryController) GetSubcategories(ctx *gin.Context) {
@@ -85,7 +86,7 @@ func (c *CategoryController) GetSubcategories(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, subcategories)
+	api.SendSuccess(ctx, http.StatusOK, subcategories)
 }
 
 func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
@@ -108,7 +109,7 @@ func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, category)
+	api.SendSuccess(ctx, http.StatusOK, category)
 }
 
 func (c *CategoryController) DeleteCategory(ctx *gin.Context) {
@@ -124,5 +125,5 @@ func (c *CategoryController) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
+	api.SendSuccess(ctx, http.StatusNoContent, struct{}{})
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func (c *VariantController) CreateVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, variant)
+	api.SendSuccess(ctx, http.StatusCreated, variant)
 }
 
 func (c *VariantController) GetVariant(ctx *gin.Context) {
@@ -48,7 +49,7 @@ func (c *VariantController) GetVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, variant)
+	api.SendSuccess(ctx, http.StatusOK, variant)
 }
 
 func (c *VariantController) GetVariantBySKU(ctx *gin.Context) {
@@ -60,7 +61,7 @@ func (c *VariantController) GetVariantBySKU(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, variant)
+	api.SendSuccess(ctx, http.StatusOK, variant)
 }
 
 func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
@@ -77,7 +78,7 @@ func (c *VariantController) GetVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, variants)
+	api.SendSuccess(ctx, http.StatusOK, variants)
 }
 
 func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
@@ -94,7 +95,7 @@ func (c *VariantController) GetActiveVariantsByProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, variants)
+	api.SendSuccess(ctx, http.StatusOK, variants)
 }
 
 func (c *VariantController) UpdateVariant(ctx *gin.Context) {
@@ -117,7 +118,7 @@ func (c *VariantController) UpdateVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, variant)
+	api.SendSuccess(ctx, http.StatusOK, variant)
 }
 
 func (c *VariantController) UpdateStock(ctx *gin.Context) {
@@ -142,7 +143,7 @@ func (c *VariantController) UpdateStock(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Stock updated successfully"})
+	api.SendSuccess(ctx, http.StatusOK, gin.H{"message": "Stock updated successfully"})
 }
 
 func (c *VariantController) DeleteVariant(ctx *gin.Context) {
@@ -158,7 +159,7 @@ func (c *VariantController) DeleteVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Variant deleted successfully"})
+	api.SendSuccess(ctx, http.StatusNoContent, struct{}{})
 }
 
 func (c *VariantController) DeactivateVariant(ctx *gin.Context) {
@@ -174,7 +175,7 @@ func (c *VariantController) DeactivateVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Variant deactivated successfully"})
+	api.SendSuccess(ctx, http.StatusOK, gin.H{"message": "Variant deactivated successfully"})
 }
 
 func (c *VariantController) ActivateVariant(ctx *gin.Context) {
@@ -190,5 +191,5 @@ func (c *VariantController) ActivateVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Variant activated successfully"})
+	api.SendSuccess(ctx, http.StatusOK, gin.H{"message": "Variant activated successfully"})
 }

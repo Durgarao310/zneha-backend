@@ -6,6 +6,7 @@ import (
 
 	"github.com/Durgarao310/zneha-backend/internal/model"
 	"github.com/Durgarao310/zneha-backend/internal/service"
+	"github.com/Durgarao310/zneha-backend/pkg/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func (c *MediaController) CreateMedia(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, media)
+	api.SendSuccess(ctx, http.StatusCreated, media)
 }
 
 func (c *MediaController) GetMedia(ctx *gin.Context) {
@@ -48,7 +49,7 @@ func (c *MediaController) GetMedia(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, media)
+	api.SendSuccess(ctx, http.StatusOK, media)
 }
 
 func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
@@ -65,7 +66,7 @@ func (c *MediaController) GetMediaByProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, media)
+	api.SendSuccess(ctx, http.StatusOK, media)
 }
 
 func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
@@ -82,7 +83,7 @@ func (c *MediaController) GetMediaByVariant(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, media)
+	api.SendSuccess(ctx, http.StatusOK, media)
 }
 
 func (c *MediaController) UpdateMedia(ctx *gin.Context) {
@@ -105,7 +106,7 @@ func (c *MediaController) UpdateMedia(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, media)
+	api.SendSuccess(ctx, http.StatusOK, media)
 }
 
 func (c *MediaController) DeleteMedia(ctx *gin.Context) {
@@ -121,7 +122,7 @@ func (c *MediaController) DeleteMedia(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Media deleted successfully"})
+	api.SendSuccess(ctx, http.StatusNoContent, struct{}{})
 }
 
 func (c *MediaController) SetPrimaryMedia(ctx *gin.Context) {
@@ -144,5 +145,5 @@ func (c *MediaController) SetPrimaryMedia(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Primary media set successfully"})
+	api.SendSuccess(ctx, http.StatusOK, gin.H{"message": "Primary media set successfully"})
 }
