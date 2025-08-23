@@ -45,7 +45,7 @@ func (s *Server) SetupRouter() {
 func (s *Server) setupMiddleware() {
 	// CORS middleware (should be first to handle preflight requests)
 	s.router.Use(pkgMiddleware.DevelopmentCORS())
-	
+
 	// Other middleware
 	s.router.Use(api.RequestMetaMiddleware())
 	s.router.Use(pkgMiddleware.JSONMiddleware())

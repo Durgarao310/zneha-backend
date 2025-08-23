@@ -11,11 +11,11 @@ import (
 func CORSMiddleware() gin.HandlerFunc {
 	return cors.New(cors.Config{
 		AllowOrigins: []string{
-			"http://localhost:3000",  // React development server
-			"http://localhost:3001",  // Alternative React port
-			"http://localhost:8080",  // Same origin
-			"http://127.0.0.1:3000",  // Local IP variant
-			"http://127.0.0.1:3001",  // Local IP variant
+			"http://localhost:3000",            // React development server
+			"http://localhost:3001",            // Alternative React port
+			"http://localhost:8080",            // Same origin
+			"http://127.0.0.1:3000",            // Local IP variant
+			"http://127.0.0.1:3001",            // Local IP variant
 			"https://your-frontend-domain.com", // Add your production domain
 		},
 		AllowMethods: []string{
@@ -39,7 +39,7 @@ func CORSMiddleware() gin.HandlerFunc {
 			"X-Request-ID",
 		},
 		AllowCredentials: true,
-		MaxAge:          12 * time.Hour,
+		MaxAge:           12 * time.Hour,
 	})
 }
 
@@ -51,6 +51,6 @@ func DevelopmentCORS() gin.HandlerFunc {
 		AllowHeaders:     []string{"*"},
 		ExposeHeaders:    []string{"*"},
 		AllowCredentials: true,
-		MaxAge:          12 * time.Hour,
+		MaxAge:           12 * time.Hour,
 	})
 }
